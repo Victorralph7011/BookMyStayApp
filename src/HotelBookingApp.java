@@ -1,23 +1,20 @@
 public class HotelBookingApp {
     public static void main(String[] args) {
-        System.out.println("Add-On Service Selection");
+        System.out.println("Booking History and Reporting\n");
 
-        AddOnServiceManager serviceManager = new AddOnServiceManager();
+        BookingHistory history = new BookingHistory();
+        BookingReportService reportService = new BookingReportService();
 
-        // Simulate a confirmed reservation ID from Use Case 6
-        String reservationId = "Single-1";
+        // Simulate confirmed bookings being added to history
+        Reservation r1 = new Reservation("Abhi", "Single");
+        Reservation r2 = new Reservation("Subha", "Double");
+        Reservation r3 = new Reservation("Vanmathi", "Suite");
 
-        // Guest selects optional services
-        AddOnService breakfast = new AddOnService("Breakfast", 500.0);
-        AddOnService spa = new AddOnService("Spa", 1000.0);
+        history.addReservation(r1);
+        history.addReservation(r2);
+        history.addReservation(r3);
 
-        // Attach services to the reservation
-        serviceManager.addService(reservationId, breakfast);
-        serviceManager.addService(reservationId, spa);
-
-        // Calculate and display total additional costs
-        double totalCost = serviceManager.calculateTotalServiceCost(reservationId);
-        System.out.println("Reservation ID: " + reservationId);
-        System.out.println("Total Add-On Cost: " + totalCost);
+        // Generate the summary report
+        reportService.generateReport(history);
     }
 }
