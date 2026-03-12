@@ -1,20 +1,35 @@
+import java.util.Scanner;
+
 public class HotelBookingApp {
     public static void main(String[] args) {
-        System.out.println("Booking History and Reporting\n");
+        System.out.println("Booking Validation");
+        Scanner scanner = new Scanner(System.in);
 
-        BookingHistory history = new BookingHistory();
-        BookingReportService reportService = new BookingReportService();
+        // Initialize required components
+        RoomInventory inventory = new RoomInventory();
+        ReservationValidator validator = new ReservationValidator();
+        BookingRequestQueue bookingQueue = new BookingRequestQueue();
 
-        // Simulate confirmed bookings being added to history
-        Reservation r1 = new Reservation("Abhi", "Single");
-        Reservation r2 = new Reservation("Subha", "Double");
-        Reservation r3 = new Reservation("Vanmathi", "Suite");
+        try {
+            System.out.print("Enter guest name: ");
+            String name = scanner.nextLine();
 
-        history.addReservation(r1);
-        history.addReservation(r2);
-        history.addReservation(r3);
+            System.out.print("Enter room type (Single Room/Double Room/Suite Room): ");
+            String type = scanner.nextLine();
 
-        // Generate the summary report
-        reportService.generateReport(history);
+            // Validate input centrally before processing
+            validator.validate(name, type, inventory);
+
+            // If valid, proceed to queue the request
+            Reservation res = new Reservation(name, type);
+            bookingQueue.addRequest(res);
+            System.out.println("Booking request accepted for " + name);
+
+        } catch (InvalidBookingException e) {
+            // Handle domain-specific validation errors gracefully
+            System.out.println("Booking failed: " + e.getMessage());
+        } finally {
+            scanner.close();
+        }
     }
 }
