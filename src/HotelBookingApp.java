@@ -1,35 +1,23 @@
-import java.util.Scanner;
-
 public class HotelBookingApp {
     public static void main(String[] args) {
-        System.out.println("Booking Validation");
-        Scanner scanner = new Scanner(System.in);
+        System.out.println("Booking Cancellation\n");
 
-        // Initialize required components
+        // Initialize components
         RoomInventory inventory = new RoomInventory();
-        ReservationValidator validator = new ReservationValidator();
-        BookingRequestQueue bookingQueue = new BookingRequestQueue();
+        CancellationService cancellationService = new CancellationService();
 
-        try {
-            System.out.print("Enter guest name: ");
-            String name = scanner.nextLine();
+        // 1. Setup: Register an existing booking (ID from UC6)
+        String resId = "Single-1";
+        String roomType = "Single Room";
+        cancellationService.registerBooking(resId, roomType);
 
-            System.out.print("Enter room type (Single Room/Double Room/Suite Room): ");
-            String type = scanner.nextLine();
+        // 2. Perform Cancellation
+        cancellationService.cancelBooking(resId, inventory);
 
-            // Validate input centrally before processing
-            validator.validate(name, type, inventory);
+        // 3. Show History and Updated State
+        cancellationService.showRollbackHistory();
 
-            // If valid, proceed to queue the request
-            Reservation res = new Reservation(name, type);
-            bookingQueue.addRequest(res);
-            System.out.println("Booking request accepted for " + name);
-
-        } catch (InvalidBookingException e) {
-            // Handle domain-specific validation errors gracefully
-            System.out.println("Booking failed: " + e.getMessage());
-        } finally {
-            scanner.close();
-        }
+        System.out.println("\nUpdated Single Room Availability: " +
+                inventory.getRoomAvailability().get(roomType));
     }
 }
