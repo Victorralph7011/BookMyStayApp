@@ -1,25 +1,23 @@
 public class HotelBookingApp {
     public static void main(String[] args) {
-        System.out.println("Room Allocation Processing");
+        System.out.println("Add-On Service Selection");
 
-        // Initialize Core Systems
-        RoomInventory inventory = new RoomInventory();
-        BookingRequestQueue bookingQueue = new BookingRequestQueue();
-        RoomAllocationService allocationService = new RoomAllocationService();
+        AddOnServiceManager serviceManager = new AddOnServiceManager();
 
-        // Guest Intent (Queueing Phase)
-        Reservation r1 = new Reservation("Abhi", "Single Room");
-        Reservation r2 = new Reservation("Subha", "Single Room");
-        Reservation r3 = new Reservation("Vanmathi", "Suite Room");
+        // Simulate a confirmed reservation ID from Use Case 6
+        String reservationId = "Single-1";
 
-        bookingQueue.addRequest(r1);
-        bookingQueue.addRequest(r2);
-        bookingQueue.addRequest(r3);
+        // Guest selects optional services
+        AddOnService breakfast = new AddOnService("Breakfast", 500.0);
+        AddOnService spa = new AddOnService("Spa", 1000.0);
 
-        // Allocation Phase (Processing the FIFO Queue)
-        while (bookingQueue.hasPendingRequests()) {
-            Reservation nextRequest = bookingQueue.getNextRequest();
-            allocationService.allocateRoom(nextRequest, inventory);
-        }
+        // Attach services to the reservation
+        serviceManager.addService(reservationId, breakfast);
+        serviceManager.addService(reservationId, spa);
+
+        // Calculate and display total additional costs
+        double totalCost = serviceManager.calculateTotalServiceCost(reservationId);
+        System.out.println("Reservation ID: " + reservationId);
+        System.out.println("Total Add-On Cost: " + totalCost);
     }
 }
