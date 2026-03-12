@@ -1,23 +1,43 @@
 public class HotelBookingApp {
     public static void main(String[] args) {
-        System.out.println("Booking Cancellation\n");
+        System.out.println("Concurrent Booking Simulation");
 
-        // Initialize components
+        // Initialize shared resources
         RoomInventory inventory = new RoomInventory();
-        CancellationService cancellationService = new CancellationService();
+        BookingRequestQueue bookingQueue = new BookingRequestQueue();
+        RoomAllocationService allocationService = new RoomAllocationService();
 
-        // 1. Setup: Register an existing booking (ID from UC6)
-        String resId = "Single-1";
-        String roomType = "Single Room";
-        cancellationService.registerBooking(resId, roomType);
+        // Seed the shared queue with multiple requests
+        bookingQueue.addRequest(new Reservation("Abhi", "Single Room"));
+        bookingQueue.addRequest(new Reservation("Vanmathi", "Double Room"));
+        bookingQueue.addRequest(new Reservation("Kural", "Suite Room"));
+        bookingQueue.addRequest(new Reservation("Subha", "Single Room"));
 
-        // 2. Perform Cancellation
-        cancellationService.cancelBooking(resId, inventory);
+        // Create booking processor tasks
+        Thread t1 = new Thread(
+                new ConcurrentBookingProcessor(bookingQueue, inventory, allocationService)
+        );
 
-        // 3. Show History and Updated State
-        cancellationService.showRollbackHistory();
+        Thread t2 = new Thread(
+                new ConcurrentBookingProcessor(bookingQueue, inventory, allocationService)
+        );
 
-        System.out.println("\nUpdated Single Room Availability: " +
-                inventory.getRoomAvailability().get(roomType));
+        // Start concurrent processing
+        t1.start();
+        t2.start();
+
+        try {
+            // Wait for both threads to finish
+            t1.join();
+            t2.join();
+        } catch (InterruptedException e) {
+            System.out.println("Thread execution interrupted.");
+        }
+
+        // Display final state
+        System.out.println("\nRemaining Inventory:");
+        inventory.getRoomAvailability().forEach((type, count) ->
+                System.out.println(type.split(" ")[0] + ": " + count)
+        );
     }
 }
